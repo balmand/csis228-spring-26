@@ -1,0 +1,27 @@
+{
+  "name": "csis228-spring-26",
+  "version": "1.0.0",
+  "description": "backend api",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "test": "jest"
+  },
+  "keywords": [
+    "CRUD",
+    "express",
+    "nodejs",
+    "postgres"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jest": "^30.2.0",
+    "pg": "^8.17.2",
+    "supertest": "^7.2.2"
+  }
+}
