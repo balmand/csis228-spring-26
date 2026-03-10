@@ -1,0 +1,41 @@
+-- Table: public.clients
+
+-- DROP TABLE IF EXISTS public.clients;
+
+CREATE TABLE IF NOT EXISTS public.clients
+(
+    client_id integer NOT NULL DEFAULT nextval('clients_client_id_seq'::regclass),
+    client_name text COLLATE pg_catalog."default",
+    client_email text COLLATE pg_catalog."default",
+    department_id integer,
+    client_salary double precision,
+    CONSTRAINT clients_pkey PRIMARY KEY (client_id),
+    CONSTRAINT clients_department__department_id FOREIGN KEY (department_id)
+        REFERENCES public.department (department_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE RESTRICT
+        NOT VALID
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.clients
+    OWNER to postgres;
+
+
+    -- Table: public.department
+
+-- DROP TABLE IF EXISTS public.department;
+
+CREATE TABLE IF NOT EXISTS public.department
+(
+    department_id integer NOT NULL DEFAULT nextval('department_department_id_seq'::regclass),
+    department_name text COLLATE pg_catalog."default",
+    department_location text COLLATE pg_catalog."default",
+    CONSTRAINT department_pkey PRIMARY KEY (department_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.department
+    OWNER to postgres;
