@@ -40,9 +40,8 @@ class ClientRepository {
         return ClientEntity.fromRows(result.rows);
     }
 
-    static async increaseSalary(clientId, amount){
-        const result = await pool.query("SELECT increase_salary($1, $2)", [clientId, amount]);
-        return result;
+    static async increaseSalary(clientId, amount) {
+        await pool.query("CALL increase_salary($1, $2)", [clientId, amount]);
     }
 
 

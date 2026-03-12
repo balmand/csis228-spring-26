@@ -36,6 +36,9 @@ class DepartmentService {
         }
         const data = DepartmentDto.fromUpdateRequest(body);
         const entity = await DepartmentRepository.update(id, data);
+        if (!entity) {
+            throw new Error("Department not found");
+        }
         return DepartmentDto.toResponseDto(entity);
     }
 

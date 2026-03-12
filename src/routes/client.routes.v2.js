@@ -9,7 +9,7 @@ router.get("/test", ClientController.getTest);
 router.get("/", ClientController.getAll);
 router.get("/:id", ClientController.getById);
 router.post("/", createValidator, ClientController.create);
-router.put("/:id", ClientController.update);
+router.put("/:id", createValidator, ClientController.update);
 router.delete("/:id", ClientController.delete);
 
 module.exports = router;

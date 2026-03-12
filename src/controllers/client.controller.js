@@ -1,10 +1,5 @@
 const ClientService = require("../services/client.service");
-
-function handleError(res, err) {
-    if (err.message?.toLowerCase().includes("not found")) return res.status(404).json({ error: err.message });
-    if (err.message?.includes("required")) return res.status(400).json({ error: err.message });
-    return res.status(500).json({ error: err.message });
-}
+const { handleError } = require("../utils/errorHandler");
 
 class ClientController {
     static async getAll(req, res) {

@@ -1,47 +1,13 @@
 /**
- * Department DTOs - map between API (camelCase) and entities/layers.
+ * Department DTOs – API contract (camelCase response/request shapes).
+ * All entity ↔ DTO conversion is done in the department mapper.
  */
 
-/**
- * @param {import("../entities/department.entity")} entity
- * @returns {{ id: number, name: string, location: string }}
- */
-function toResponseDto(entity) {
-    if (!entity) return null;
-    return {
-        id: entity.dep_id,
-        name: entity.dep_name,
-        location: entity.dep_location,
-    };
-}
-
-/**
- * @param {import("../entities/department.entity")[]} entities
- * @returns {{ id: number, name: string, location: string }[]}
- */
-function toListDto(entities) {
-    return (entities || []).map(toResponseDto);
-}
-
-/**
- * @param {{ name?: string, location?: string }} body - validated request body
- * @returns {{ name: string, location: string }}
- */
-function fromCreateRequest(body) {
-    return { name: body.name, location: body.location };
-}
-
-/**
- * @param {{ name?: string, location?: string }} body - validated request body
- * @returns {{ name: string, location: string }}
- */
-function fromUpdateRequest(body) {
-    return { name: body.name, location: body.location };
-}
+const DepartmentMapper = require("../mappers/department.mapper");
 
 module.exports = {
-    toResponseDto,
-    toListDto,
-    fromCreateRequest,
-    fromUpdateRequest,
+    toResponseDto: DepartmentMapper.entityToResponseDto,
+    toListDto: DepartmentMapper.entitiesToListDto,
+    fromCreateRequest: DepartmentMapper.createRequestToData,
+    fromUpdateRequest: DepartmentMapper.updateRequestToData,
 };

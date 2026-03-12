@@ -30,6 +30,9 @@ class ClientService {
         }
         const data = ClientDto.fromUpdateRequest(body);
         const entity = await ClientRepository.update(id, data);
+        if (!entity) {
+            throw new Error("Client not found");
+        }
         return ClientDto.toResponseDto(entity);
     }
 
