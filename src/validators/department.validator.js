@@ -8,8 +8,9 @@ const validateRequest = (req, res, next) => {
     next();
 };
 
-exports.createValidator = [
-    body("email").isEmail().normalizeEmail(),
+exports.createDepartmentValidator = [
     body("name").trim().notEmpty().withMessage("Name is required"),
+    body("location").trim().notEmpty().withMessage("Location is required"),
     validateRequest,
 ];
+

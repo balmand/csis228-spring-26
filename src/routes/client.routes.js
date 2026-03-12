@@ -8,7 +8,7 @@ router.get("/with-departments", ClientController.getAllWithDepartments);
 router.get("/", ClientController.getAll);
 router.get("/:id", ClientController.getById);
 router.post("/", createValidator, ClientController.create);
-router.put("/:id", ClientController.update)
+router.put("/:id", ClientController.update);
 router.delete("/:id", ClientController.delete);
 
 

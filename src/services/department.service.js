@@ -1,80 +1,88 @@
 const DepartmentRepository = require("../repositories/department.repository");
-const EmployeeServices = require("../services/client.service");
+const ClientRepository = require("../repositories/client.repository");
+const DepartmentDto = require("../dtos/department.dto");
 
 class DepartmentService {
+    static async getAll() {
+        const entities = await DepartmentRepository.findAll();
+        return DepartmentDto.toListDto(entities);
+    }
 
-    static async getAll(){
+    /** Returns raw entities for internal use (e.g. depPer). */
+    static async _getAllEntities() {
         return await DepartmentRepository.findAll();
     }
 
-    static async getById(id){
-        const dep = await DepartmentRepository.findById(id);
-        if(!dep){
-            throw new Error("Dep not found");
+    static async getById(id) {
+        const entity = await DepartmentRepository.findById(id);
+        if (!entity) {
+            throw new Error("Department not found");
         }
-        return dep;
+        return DepartmentDto.toResponseDto(entity);
     }
 
-    static async create(data){
-        if(!data.name || !data.location){
+    static async create(body) {
+        if (!body.name || !body.location) {
             throw new Error("Name and location are required");
         }
-
-        return DepartmentRepository.create(data)
+        const data = DepartmentDto.fromCreateRequest(body);
+        const entity = await DepartmentRepository.create(data);
+        return DepartmentDto.toResponseDto(entity);
     }
 
-    static async update(id, data){
-        if(!id || !data.name || !data.location){
-            throw new Error("ID, Name and location are required");
+    static async update(id, body) {
+        if (!id || !body.name || !body.location) {
+            throw new Error("ID, name and location are required");
         }
-        return DepartmentRepository.update(id, data);
+        const data = DepartmentDto.fromUpdateRequest(body);
+        const entity = await DepartmentRepository.update(id, data);
+        return DepartmentDto.toResponseDto(entity);
     }
 
-    static async delete(id){
-        if(!id){
+    static async delete(id) {
+        if (!id) {
             throw new Error("ID is required");
         }
-        const dep = DepartmentRepository.findById(id);
-        if(!dep){
-            throw new Error("Client Not found");
+        const entity = await DepartmentRepository.findById(id);
+        if (!entity) {
+            throw new Error("Department not found");
         }
-        return DepartmentRepository.deleteById(id);
+        await DepartmentRepository.deleteById(id);
     }
 
-    static async departmentsClients(){
-        const deps = await DepartmentRepository.findDepartmentClients();
-        if(!deps){
+    static async departmentsClients() {
+        const rows = await DepartmentRepository.findDepartmentClients();
+        if (!rows) {
             throw new Error("Data not found");
         }
-        return deps;
+        return rows;
     }
 
-    static async depPer () {
-        const deps = await this.getAll();
-        const emps = await EmployeeServices.getAllClients();
+    static async depPer() {
+        const deps = await this._getAllEntities();
+        const clientEntities = await ClientRepository.findAll();
         let itIndex = 0;
         let salesIndex = 0;
         let hrIndex = 0;
 
-        for(let dep of deps){
-            for(let emp of emps){
-                if(emp.dep_id === dep.dep_id){
-                    switch(dep.dep_name){
-                        case "Sales": salesIndex++;
-                            break;
-                        case "IT" : itIndex++;
-                            break;
-                        case "hr" : hrIndex++;
+        for (const dep of deps) {
+            for (const client of clientEntities) {
+                if (client.dep_id === dep.dep_id) {
+                    switch ((dep.dep_name || "").toLowerCase()) {
+                        case "sales": salesIndex++; break;
+                        case "it": itIndex++; break;
+                        case "hr": hrIndex++;
                     }
                 }
             }
         }
 
-        return{
-            "Sales": ((salesIndex / emps.length)*100),
-            "IT": ((itIndex / emps.length)*100),
-            "HR": ((hrIndex / emps.length)*100),
-        }
+        const total = clientEntities.length || 1;
+        return {
+            Sales: (salesIndex / total) * 100,
+            IT: (itIndex / total) * 100,
+            HR: (hrIndex / total) * 100,
+        };
 
     }
 
