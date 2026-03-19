@@ -1,20 +1,23 @@
+const ClientRepository = require("../repositories/client.repository");
 const { generateToken } = require("../utils/token");
 
 class AuthService {
-    static login({ username, password }) {
-        const expectedUsername = process.env.AUTH_USERNAME || "admin";
-        const expectedPassword = process.env.AUTH_PASSWORD || "password123";
+    static async login ({ email, password }) {
 
-        if (!username || !password) {
-            throw new Error("Username and password are required");
+        if (!email || !password) {
+            throw new Error("Email and password are required");
         }
 
-        if (username !== expectedUsername || password !== expectedPassword) {
-            throw new Error("Invalid credentials");
+        const expectedClient = await ClientRepository.authenticate(email, password);
+
+        if (!expectedClient) {
+            throw new Error("Invalid Credentials")
         }
+
+        const token = generateToken({sub: email});
 
         return {
-            token: generateToken({ sub: username }),
+            token,
         };
     }
 }

@@ -44,6 +44,12 @@ class ClientRepository {
         await pool.query("CALL increase_salary($1, $2)", [clientId, amount]);
     }
 
+    static async authenticate(email, password){
+        const result = await pool.query(
+            `SELECT * FROM clients WHERE client_email = $1 AND client_password = $2`, [email, password]);
+        return ClientEntity.fromRow(result.rows[0]);
+    }
+
 
 }
 

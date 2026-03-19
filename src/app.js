@@ -7,7 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const app = express();
 
 app.use(express.json());
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/clients", clientRoutes);
 app.use("/api/v2/clients", clientRoutesV2);
 app.use("/api/dep", departmentRoutes);
