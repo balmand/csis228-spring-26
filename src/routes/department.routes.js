@@ -1,8 +1,11 @@
 const express = require("express");
 const DepartmentController = require("../controllers/department.controller");
 const { createDepartmentValidator } = require("../validators/department.validator");
+const { authenticate } = require("../middleware/auth.middleware");
 
 const router = express.Router();
+
+router.use(authenticate);
 
 router.get("/dep-per", DepartmentController.getDepPerc);
 router.get("/deps-with-emps", DepartmentController.getDepsWithEmps);
