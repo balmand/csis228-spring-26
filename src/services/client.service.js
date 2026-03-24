@@ -2,8 +2,9 @@ const ClientRepository = require("../repositories/client.repository");
 const ClientDto = require("../dtos/client.dto");
 
 class ClientService {
-    static async getAllClients() {
-        const entities = await ClientRepository.findAll();
+    static async getAllClients(filters = {}) {
+        const normalizedFilters = ClientService.normalizeFilters(filters);
+        const entities = await ClientRepository.findAll(normalizedFilters);
         return ClientDto.toListDto(entities);
     }
 
@@ -50,6 +51,20 @@ class ClientService {
     static async getAllClientsWithDepartments() {
         const entities = await ClientRepository.findAllWithDepartments();
         return ClientDto.toListWithDepartmentDto(entities);
+    }
+
+    static normalizeFilters(filters = {}) {
+        const normalizedFilters = {};
+
+        if (typeof filters.name === "string" && filters.name.trim()) {
+            normalizedFilters.name = filters.name.trim();
+        }
+
+        if (typeof filters.email === "string" && filters.email.trim()) {
+            normalizedFilters.email = filters.email.trim();
+        }
+
+        return normalizedFilters;
     }
 }
 

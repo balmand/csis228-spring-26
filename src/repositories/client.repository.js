@@ -2,8 +2,28 @@ const pool = require("../db/pool");
 const ClientEntity = require("../entities/client.entity");
 
 class ClientRepository {
-    static async findAll() {
-        const result = await pool.query(`SELECT * FROM clients ORDER BY client_id`);
+    static async findAll(filters = {}) {
+        const conditions = [];
+        const values = [];
+
+        if (filters.name) {
+            values.push(`%${filters.name}%`);
+            conditions.push(`client_name ILIKE $${values.length}`);
+        }
+
+        if (filters.email) {
+            values.push(`%${filters.email}%`);
+            conditions.push(`client_email ILIKE $${values.length}`);
+        }
+
+        const whereClause = conditions.length
+            ? ` WHERE ${conditions.join(" AND ")}`
+            : "";
+
+        const result = await pool.query(
+            `SELECT * FROM clients${whereClause} ORDER BY client_id`,
+            values
+        );
         return ClientEntity.fromRows(result.rows);
     }
 

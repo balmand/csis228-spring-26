@@ -32,10 +32,10 @@ This middleware reads incoming JSON bodies and makes the data available on `req.
 Authentication starts with the public login route:
 
 ```js
-app.use("/api/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 ```
 
-`POST /api/auth/login` expects:
+`POST /api/v1/auth/login` expects:
 
 ```json
 {
@@ -195,6 +195,212 @@ then `handleError` returns:
 
 with status `404`.
 
+## Complex Example: Authenticated Admin Workflow
+
+This example walks through a realistic sequence for an admin user:
+
+1. Log in and get a bearer token.
+2. Create a new department.
+3. Try an invalid client request and observe validation middleware.
+4. Create a valid client.
+5. Filter clients with query parameters.
+6. Read the joined client/department view.
+7. Read department reporting endpoints.
+
+Start the server:
+
+```bash
+npm start
+```
+
+### 1. Log in
+
+```bash
+curl -s http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin",
+    "password": "password123"
+  }'
+```
+
+Expected response:
+
+```json
+{
+  "token": "eyJ..."
+}
+```
+
+Save the token in your shell:
+
+```bash
+TOKEN="paste-the-token-here"
+```
+
+### 2. Create a department
+
+```bash
+curl -s http://localhost:3000/api/dep \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Research",
+    "location": "Beirut"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "id": 4,
+  "name": "Research",
+  "location": "Beirut"
+}
+```
+
+### 3. Trigger validation on purpose
+
+This request is authenticated, but it fails validation because `name` is empty and `email` is not valid:
+
+```bash
+curl -s http://localhost:3000/api/v1/clients \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "",
+    "email": "not-an-email"
+  }'
+```
+
+Expected response shape:
+
+```json
+{
+  "errors": [
+    {
+      "msg": "Invalid value",
+      "path": "email"
+    },
+    {
+      "msg": "Name is required",
+      "path": "name"
+    }
+  ]
+}
+```
+
+### 4. Create a valid client
+
+```bash
+curl -s http://localhost:3000/api/v1/clients \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Leila Haddad",
+    "email": "leila.haddad@example.com"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "id": 7,
+  "name": "Leila Haddad",
+  "email": "leila.haddad@example.com"
+}
+```
+
+### 5. Filter the protected client list
+
+The service layer normalizes query parameters before building the SQL filter:
+
+```bash
+curl -s "http://localhost:3000/api/v1/clients?name=leila&email=@example.com" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 7,
+    "name": "Leila Haddad",
+    "email": "leila.haddad@example.com"
+  }
+]
+```
+
+### 6. Read the joined client/department view
+
+This route returns nested department data when the backing database view contains it:
+
+```bash
+curl -s http://localhost:3000/api/v1/clients/with-departments \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "email": "alice@example.com",
+    "department": {
+      "id": 2,
+      "name": "IT",
+      "location": "Tripoli"
+    }
+  },
+  {
+    "id": 7,
+    "name": "Leila Haddad",
+    "email": "leila.haddad@example.com",
+    "department": null
+  }
+]
+```
+
+### 7. Read department reporting endpoints
+
+Department/client aggregate function:
+
+```bash
+curl -s http://localhost:3000/api/dep/deps-with-emps \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Department percentage calculation:
+
+```bash
+curl -s http://localhost:3000/api/dep/dep-per \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Example response:
+
+```json
+{
+  "Sales": 33.33333333333333,
+  "IT": 50,
+  "HR": 16.666666666666664
+}
+```
+
+### What this example demonstrates
+
+- Public login returns a token.
+- Protected routes reject requests without `Authorization: Bearer <token>`.
+- Validation middleware can stop bad input before the controller runs.
+- Services and repositories support filtered client reads.
+- DTO/mappers convert database-shaped rows into API-shaped JSON.
+- Reporting routes can return either raw aggregate rows or computed percentages depending on the endpoint.
+
 ## Where `handleError` Is Used
 
 `handleError` is used in the controller methods that catch service errors, for example in [`src/controllers/client.controller.js`](/Users/cbf/dev/csis228-spring-26/src/controllers/client.controller.js):
@@ -217,6 +423,8 @@ Some controller methods still return `500` directly instead of using `handleErro
 That means error handling is only partially centralized right now.
 
 ## Summary
+
+This project is a good example of an Express API that layers authentication, validation, controllers, services, repositories, DTOs, and mappers. The complex workflow above shows how those pieces work together in one realistic request sequence.
 
 - Middleware runs before controllers.
 - Authentication middleware protects the client and department routes.

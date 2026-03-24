@@ -4,7 +4,7 @@ const { handleError } = require("../utils/errorHandler");
 class ClientController {
     static async getAll(req, res) {
         try {
-            const clients = await ClientService.getAllClients();
+            const clients = await ClientService.getAllClients(req.query);
             res.json(clients);
         } catch (err) {
             res.status(500).json({ error: err.message });
