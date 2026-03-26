@@ -10,6 +10,10 @@ class AuthController {
             return handleError(res, err);
         }
     }
+
+    static async me(req, res) {
+        res.status(200).json({ user: req.user });
+    }
 }
 
 module.exports = AuthController;

@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../app');
+const bcrypt = require("bcryptjs");
 
 describe('GET /api/hello', () =>{
     it('should return Hello world', async () =>{
@@ -19,7 +20,7 @@ test('POST /api/user', async() =>{
 describe('Authentication', () => {
     beforeEach(() => {
         process.env.AUTH_USERNAME = 'admin';
-        process.env.AUTH_PASSWORD = 'password123';
+        process.env.AUTH_PASSWORD_HASH = bcrypt.hashSync("password123", 10);
         process.env.AUTH_SECRET = 'test-secret';
         process.env.AUTH_TOKEN_TTL_SECONDS = '3600';
     });

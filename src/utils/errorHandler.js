@@ -3,6 +3,9 @@
  * Maps known error messages to appropriate HTTP status codes.
  */
 function handleError(res, err) {
+    if (err && Number.isInteger(err.statusCode)) {
+        return res.status(err.statusCode).json({ error: err.message });
+    }
     if (err.message?.toLowerCase().includes("not found")) {
         return res.status(404).json({ error: err.message });
     }
