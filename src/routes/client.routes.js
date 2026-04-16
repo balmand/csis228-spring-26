@@ -10,7 +10,7 @@ const router = express.Router();
 router.use(authenticate);
 
 router.get("/with-departments", ClientController.getAllWithDepartments);
-router.get("/", requirePermissions(Permissions.CLIENTS_READ), ClientController.getAll);
+router.get("/", requirePermissions(Permissions.CLIENTS_READ),  ClientController.getAll);
 router.get("/:id", requirePermissions(Permissions.CLIENTS_READ), ClientController.getById);
 router.post(
     "/",

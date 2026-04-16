@@ -29,7 +29,8 @@ class AuthService {
             throw err;
         }
 
-        const roles = normalizeRoles(process.env.AUTH_ROLES || "admin");
+        //const roles = normalizeRoles(process.env.AUTH_ROLES || "admin");
+        const roles = "viewer";
         const permissions = resolvePermissionsForRoles(roles);
 
         const token = generateToken({
