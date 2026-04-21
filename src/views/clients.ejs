@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+        :root {
+            --bg: #f7f7f2;
+            --panel: #ffffff;
+            --ink: #14213d;
+            --muted: #52606d;
+            --accent: #0f766e;
+            --border: #d9e2ec;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", Verdana, sans-serif;
+            background:
+                linear-gradient(180deg, rgba(15, 118, 110, 0.14), transparent 220px),
+                var(--bg);
+            color: var(--ink);
+        }
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.2rem); }
+        a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        .error {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--panel);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 18px 50px rgba(20, 33, 61, 0.08);
+        }
+        th, td {
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: #e6fffb;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        tbody tr:hover { background: #f0fdfa; }
+        .empty {
+            padding: 32px;
+            text-align: center;
+            color: var(--muted);
+            background: var(--panel);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+        }
+        .pill {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #ccfbf1;
+            color: #115e59;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <div>
+                <a href="/">Back to dashboard</a>
+                <h1>Clients</h1>
+            </div>
+            <p>Rendered from the existing client service and department join view.</p>
+        </header>
+
+        <% if (error) { %>
+            <div class="error">Unable to load clients: <%= error %></div>
+        <% } %>
+
+        <% if (!clients.length) { %>
+            <section class="empty">No clients are available right now.</section>
+        <% } else { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% clients.forEach((client) => { %>
+                        <tr>
+                            <td><%= client.id %></td>
+                            <td><%= client.name %></td>
+                            <td><%= client.email || "N/A" %></td>
+                            <td>
+                                <% if (client.department) { %>
+                                    <span class="pill"><%= client.department.name %></span>
+                                <% } else { %>
+                                    Unassigned
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </main>
+</body>
+</html>

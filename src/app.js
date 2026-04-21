@@ -1,12 +1,19 @@
 const express = require("express");
+const path = require("path");
 const clientRoutes = require("./routes/client.routes");
 const clientRoutesV2 = require("./routes/client.routes.v2");
 const departmentRoutes = require("./routes/department.routes");
 const authRoutes = require("./routes/auth.routes");
+const viewRoutes = require("./routes/view.routes");
 
 const app = express();
 
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/", viewRoutes);
 app.use("/api/v1/auth", authRoutes);
 // Backwards-compatible alias (older tests/docs used /api/auth)
 app.use("/api/auth", authRoutes);

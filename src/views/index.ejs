@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f4efe6;
+            --panel: #fffdf8;
+            --ink: #1f2937;
+            --accent: #b45309;
+            --accent-soft: #fde68a;
+            --border: #e5dccf;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top right, rgba(180, 83, 9, 0.15), transparent 30%),
+                linear-gradient(135deg, #f9f5ef, var(--bg));
+        }
+        main {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 48px 20px 64px;
+        }
+        .hero, .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 18px 50px rgba(31, 41, 55, 0.08);
+        }
+        .hero { padding: 32px; }
+        .eyebrow {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.85rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        h1 { margin: 16px 0 12px; font-size: clamp(2.2rem, 6vw, 4rem); }
+        p { line-height: 1.6; }
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .button {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #fff7ed;
+            font-weight: 600;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .panel { padding: 20px; }
+        .metric {
+            font-size: 2rem;
+            margin: 8px 0 0;
+            color: var(--accent);
+        }
+        .error {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="hero">
+            <span class="eyebrow">EJS Enabled</span>
+            <h1>Rendered views for your Express project</h1>
+            <p>
+                This dashboard uses EJS as the server-side view engine and reads from your
+                existing service layer so the pages stay aligned with the API.
+            </p>
+
+            <% if (error) { %>
+                <div class="error">Unable to load live data: <%= error %></div>
+            <% } %>
+
+            <nav>
+                <a class="button" href="/views/clients">Open clients view</a>
+                <a class="button" href="/views/departments">Open departments view</a>
+                <a class="button" href="/api/hello">Test API endpoint</a>
+            </nav>
+        </section>
+
+        <section class="grid">
+            <article class="panel">
+                <p>Total clients</p>
+                <p class="metric"><%= summary.clients %></p>
+            </article>
+            <article class="panel">
+                <p>Total departments</p>
+                <p class="metric"><%= summary.departments %></p>
+            </article>
+            <article class="panel">
+                <p>Clients with departments</p>
+                <p class="metric"><%= summary.assignedClients %></p>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
